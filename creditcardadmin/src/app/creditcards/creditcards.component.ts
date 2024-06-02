@@ -2,78 +2,51 @@ import { Component, ViewChild } from '@angular/core';
 import { CreditCard } from '../models/credit-card';
 import { MatTableDataSource } from '@angular/material/table';
 import { SelectionModel } from '@angular/cdk/collections';
-import { MatPaginator } from '@angular/material/paginator';
+import { MatPaginator} from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-
-const TABLE_DATA: CreditCard[] = [
-  {
-    id: 1,
-    name: 'Bank of America',
-    description: "Bank of America offers customers with various options",
-    bankName: "Bank of America",
-    maxCredit: 3000,
-    interestRate: 10,
-    active: true,
-    recommendedScore: '700-900',
-    annualFee: 4,
-    termsAndConditions: 'following are the terms and conditions',
-    createdDate: '2023-31-08',
-    updatedDate: '2023-31-08'
-  },
-  {
-    id: 2,
-    name: 'Bank of America',
-    description: "Bank of America offers customers with various options",
-    bankName: "Bank of America",
-    maxCredit: 3000,
-    interestRate: 10,
-    active: true,
-    recommendedScore: '700-900',
-    annualFee: 4,
-    termsAndConditions: 'following are the terms and conditions',
-    createdDate: '2023-31-08',
-    updatedDate: '2023-31-08'
-  },
-  {
-    id: 3,
-    name: 'Bank of America',
-    description: "Bank of America offers customers with various options",
-    bankName: "Bank of America",
-    maxCredit: 3000,
-    interestRate: 10,
-    active: true,
-    recommendedScore: '700-900',
-    annualFee: 4,
-    termsAndConditions: 'following are the terms and conditions',
-    createdDate: '2023-31-08',
-    updatedDate: '2023-31-08'
-  }
-];
+import { CreditcardsService } from '../services/creditcards.service';
 
 @Component({
   selector: 'app-creditcards',
   templateUrl: './creditcards.component.html',
-  styleUrl: './creditcards.component.css'
+  styleUrls: ['./creditcards.component.scss']
 })
 export class CreditcardsComponent {
 
-  displayColumns = ["select", "id", "name", "description", "bankName", "maxCredit", "interestRate", "active", "recommendedScore", "annualFee", "termsAndConditions", "createdDate", "updatedDate"];
+  creditcards: CreditCard[] = [];
 
+  creditCardMaximumAmount: number = 0;
+  creditCardMaximumInterest: number = 0;
 
-  dataSource = new MatTableDataSource(TABLE_DATA);
+  constructor(private creditCardsService: CreditcardsService) {
+    this.creditCardsService.getCreditCards().subscribe((data:CreditCard[]) => {
+      this.creditcards = data;
+
+      this.dataSource = new MatTableDataSource(this.creditcards);
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
+
+      this.calculateMetrics();
+
+    })
+  }
+
+  dataSource = new MatTableDataSource(this.creditcards);
+
+  displayColumns = ["select", "id", "name", "description", "bankName", "maxCredit", "interestRate", "active", "recommendedScore", "actions"];
 
   selection = new SelectionModel(true, []);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  ngAfterViewInt(){
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+  selectHandler(row: CreditCard){
+    this.selection.toggle(row as never);
   }
 
-  selectHandler(row: CreditCard){
-  this.selection.toggle(row as never);
-}
-
+  calculateMetrics(){
+    this.creditCardMaximumAmount = this.creditcards.filter(card => card.maxCredit > 3000).length;
+    this.creditCardMaximumInterest = this.creditcards.filter(card => card.interestRate > 7).length;
+    
+  }
 }
