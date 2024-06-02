@@ -57,7 +57,8 @@ const TABLE_DATA: CreditCard[] = [
 })
 export class CreditcardsComponent {
 
-  displayColumns = ["select", "id", "name", "description", "bankName", "maxCredit", "interestRate", "active", "recommendedScore", " annualFee", " termsAndConditions", "createdDate", "updatedDate"]
+  displayColumns = ["select", "id", "name", "description", "bankName", "maxCredit", "interestRate", "active", "recommendedScore", "annualFee", "termsAndConditions", "createdDate", "updatedDate"];
+
 
   dataSource = new MatTableDataSource(TABLE_DATA);
 
